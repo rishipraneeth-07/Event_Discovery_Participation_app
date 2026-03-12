@@ -19,8 +19,8 @@ public class Notification {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false)
-    private boolean read;
+    @Column(nullable = false,name = "is_read")
+    private boolean isread;
 
     @ManyToOne
     @JoinColumn(name = "user_id",nullable = false)
