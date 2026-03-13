@@ -1,4 +1,4 @@
-package com.college.eventapp.Repository;
+package com.college.eventapp.repository;
 
 import com.college.eventapp.model.Role;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,4 +1,4 @@
-package com.college.eventapp.Repository;
+package com.college.eventapp.repository;
 
 import com.college.eventapp.model.Event;
 import com.college.eventapp.model.EventStatus;
