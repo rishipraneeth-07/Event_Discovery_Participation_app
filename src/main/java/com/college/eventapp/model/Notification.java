@@ -20,7 +20,7 @@ public class Notification {
     private LocalDateTime createdAt;
 
     @Column(nullable = false,name = "is_read")
-    private boolean isread;
+    private boolean read;
 
     @ManyToOne
     @JoinColumn(name = "user_id",nullable = false)
