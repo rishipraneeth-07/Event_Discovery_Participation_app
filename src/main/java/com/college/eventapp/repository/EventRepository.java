@@ -12,4 +12,5 @@ import java.util.List;
 public interface EventRepository extends JpaRepository<Event,Long> {
     List<Event> findByOrganizer(User organizer);
     List<Event> findByStatus(EventStatus status);
+    List<Event> findByTitleContainingIgnoreCase(String title);
 }
