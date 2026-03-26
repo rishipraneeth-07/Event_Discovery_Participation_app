@@ -6,10 +6,12 @@ import com.college.eventapp.model.User;
 import com.college.eventapp.repository.EventRepository;
 import com.college.eventapp.repository.RegistrationRepository;
 import com.college.eventapp.repository.UserRepository;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Service
 public class RegistrationServiceImpl implements RegistrationService {
     private final RegistrationRepository registrationRepository;
     private final UserRepository userRepository;
@@ -46,7 +48,6 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     public List<Registration> getUserRegistrations(Long userId) {
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -55,7 +56,6 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     public List<Registration> getEventRegistrations(Long eventId) {
-
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
