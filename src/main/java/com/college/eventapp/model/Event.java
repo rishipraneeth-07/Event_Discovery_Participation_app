@@ -28,6 +28,12 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private EventStatus status;
 
+    @Column
+    private String category;
+
+    @Column
+    private Integer capacity = 0;
+
     @ManyToOne
     @JoinColumn(name = "organizer_id",nullable = false)
     private User organizer;
