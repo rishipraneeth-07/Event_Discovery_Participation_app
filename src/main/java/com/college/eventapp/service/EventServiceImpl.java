@@ -11,29 +11,28 @@ import java.util.List;
 
 @Service
 public class EventServiceImpl implements EventService {
-    private EventRepository eventRepository;
-    private UserRepository userRepository;
-    public EventServiceImpl(EventRepository eventRepository, UserRepository userRepository) {
+
+    private final EventRepository eventRepository;
+    private final UserRepository userRepository;
+
+    public EventServiceImpl(EventRepository eventRepository,
+                            UserRepository userRepository) {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
     }
 
     @Override
     public Event createEvent(Event event) {
-
         Long organizerId = event.getOrganizer().getId();
-
         User organizer = userRepository.findById(organizerId)
                 .orElseThrow(() -> new RuntimeException("Organizer not found"));
         event.setOrganizer(organizer);
         event.setStatus(EventStatus.PENDING);
-
         return eventRepository.save(event);
     }
 
     @Override
     public Event updateEvent(Long id, Event updatedEvent) {
-
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
@@ -42,15 +41,20 @@ public class EventServiceImpl implements EventService {
         event.setLocation(updatedEvent.getLocation());
         event.setEventDateTime(updatedEvent.getEventDateTime());
 
+        if (updatedEvent.getCategory() != null) {
+            event.setCategory(updatedEvent.getCategory());
+        }
+        if (updatedEvent.getCapacity() != null) {
+            event.setCapacity(updatedEvent.getCapacity());
+        }
+
         return eventRepository.save(event);
     }
 
     @Override
     public void deleteEvent(Long id) {
-
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
-
         eventRepository.delete(event);
     }
 
@@ -72,32 +76,24 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<Event> getEventsByOrganizer(Long organizerId) {
-
         User organizer = userRepository.findById(organizerId)
                 .orElseThrow(() -> new RuntimeException("Organizer not found"));
-
         return eventRepository.findByOrganizer(organizer);
     }
 
     @Override
     public Event approveEvent(Long eventId) {
-
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
-
         event.setStatus(EventStatus.APPROVED);
-
         return eventRepository.save(event);
     }
 
     @Override
     public Event rejectEvent(Long eventId) {
-
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
-
         event.setStatus(EventStatus.REJECTED);
-
         return eventRepository.save(event);
     }
 }
