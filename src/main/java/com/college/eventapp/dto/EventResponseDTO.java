@@ -12,7 +12,11 @@ public class EventResponseDTO {
     private String location;
     private LocalDateTime eventDateTime;
     private EventStatus status;
-
+    private String date;
+    private String time;
+    private String category;
+    private Integer capacity;
+    private Integer registeredCount;
     private Long organizerId;
     private String organizerName;
 }
