@@ -8,4 +8,6 @@ public interface RegistrationService {
     Registration registerForEvent(Long userId, Long eventId);
     List<Registration> getUserRegistrations(Long userId);
     List<Registration> getEventRegistrations(Long eventId);
+    void cancelRegistration(Long registrationId);
+    boolean isUserRegistered(Long userId, Long eventId);
 }
