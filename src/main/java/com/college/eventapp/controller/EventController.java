@@ -80,6 +80,27 @@ public class EventController {
                 .collect(Collectors.toList());
     }
 
+    // ✅ NEW - Get events by organizer
+    @GetMapping("/organizer/{organizerId}")
+    public List<EventResponseDTO> getEventsByOrganizer(@PathVariable Long organizerId) {
+        return eventService.getEventsByOrganizer(organizerId)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    // ✅ NEW - Search events by keyword
+    @GetMapping("/search")
+    public List<EventResponseDTO> searchEvents(@RequestParam String keyword) {
+        return eventService.getAllEvents()
+                .stream()
+                .filter(e -> e.getTitle().toLowerCase().contains(keyword.toLowerCase())
+                        || e.getDescription().toLowerCase().contains(keyword.toLowerCase())
+                        || e.getLocation().toLowerCase().contains(keyword.toLowerCase()))
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
     private EventResponseDTO convertToDTO(Event event) {
         EventResponseDTO dto = new EventResponseDTO();
         dto.setId(event.getId());
