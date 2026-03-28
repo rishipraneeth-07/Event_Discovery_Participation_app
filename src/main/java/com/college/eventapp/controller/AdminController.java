@@ -6,6 +6,11 @@ import com.college.eventapp.repository.RegistrationRepository;
 import com.college.eventapp.service.EventService;
 import com.college.eventapp.service.NotificationService;
 import org.springframework.web.bind.annotation.*;
+import com.college.eventapp.dto.AdminStatsDTO;
+import com.college.eventapp.model.EventStatus;
+import com.college.eventapp.model.Role;
+import com.college.eventapp.repository.EventRepository;
+import com.college.eventapp.repository.UserRepository;
 
 import java.time.format.DateTimeFormatter;
 
@@ -16,13 +21,33 @@ public class AdminController {
     private final EventService eventService;
     private final RegistrationRepository registrationRepository;
     private final NotificationService notificationService;
+    private final EventRepository eventRepository;
+    private final UserRepository userRepository;
 
     public AdminController(EventService eventService,
                            RegistrationRepository registrationRepository,
-                           NotificationService notificationService) {
+                           NotificationService notificationService,
+                           EventRepository eventRepository,
+                           UserRepository userRepository) {
         this.eventService = eventService;
         this.registrationRepository = registrationRepository;
         this.notificationService = notificationService;
+        this.eventRepository = eventRepository;
+        this.userRepository = userRepository;
+    }
+
+    @GetMapping("/stats")
+    public AdminStatsDTO getStats() {
+        AdminStatsDTO stats = new AdminStatsDTO();
+        stats.setTotalEvents(eventRepository.count());
+        stats.setPendingEvents(eventRepository.findByStatus(EventStatus.PENDING).size());
+        stats.setApprovedEvents(eventRepository.findByStatus(EventStatus.APPROVED).size());
+        stats.setRejectedEvents(eventRepository.findByStatus(EventStatus.REJECTED).size());
+        stats.setTotalUsers(userRepository.count());
+        stats.setTotalStudents(userRepository.findByRole(Role.STUDENT).size());
+        stats.setTotalOrganizers(userRepository.findByRole(Role.ORGANIZER).size());
+        stats.setTotalRegistrations(registrationRepository.count());
+        return stats;
     }
 
     @PutMapping("/{id}/approve")
