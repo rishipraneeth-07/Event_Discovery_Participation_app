@@ -13,6 +13,7 @@ import java.util.List;
 
 @Service
 public class RegistrationServiceImpl implements RegistrationService {
+
     private final RegistrationRepository registrationRepository;
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
@@ -27,15 +28,22 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     public Registration registerForEvent(Long userId, Long eventId) {
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
+        // ✅ Check if already registered
         if (registrationRepository.existsByUserAndEvent(user, event)) {
             throw new RuntimeException("User already registered for this event");
+        }
+
+        // ✅ Check capacity
+        int currentCount = registrationRepository.findByEvent(event).size();
+        if (event.getCapacity() != null && event.getCapacity() > 0
+                && currentCount >= event.getCapacity()) {
+            throw new RuntimeException("Event is full. No seats available");
         }
 
         Registration registration = new Registration();
@@ -50,7 +58,6 @@ public class RegistrationServiceImpl implements RegistrationService {
     public List<Registration> getUserRegistrations(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
         return registrationRepository.findByUser(user);
     }
 
@@ -58,7 +65,24 @@ public class RegistrationServiceImpl implements RegistrationService {
     public List<Registration> getEventRegistrations(Long eventId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
-
         return registrationRepository.findByEvent(event);
+    }
+
+    // ✅ NEW - Cancel registration
+    @Override
+    public void cancelRegistration(Long registrationId) {
+        Registration registration = registrationRepository.findById(registrationId)
+                .orElseThrow(() -> new RuntimeException("Registration not found"));
+        registrationRepository.delete(registration);
+    }
+
+    // ✅ NEW - Check if user already registered
+    @Override
+    public boolean isUserRegistered(Long userId, Long eventId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
+        return registrationRepository.existsByUserAndEvent(user, event);
     }
 }
