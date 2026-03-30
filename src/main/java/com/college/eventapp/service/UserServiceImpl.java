@@ -59,4 +59,35 @@ public class UserServiceImpl implements UserService {
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
+    @Override
+    public User updateUser(Long id, String name, String email,
+                           String currentPassword, String newPassword) {
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Update name
+        if (name != null && !name.isBlank()) {
+            user.setName(name);
+        }
+
+        // Update email
+        if (email != null && !email.isBlank() && !email.equals(user.getEmail())) {
+            if (userRepository.existsByEmail(email)) {
+                throw new RuntimeException("Email already in use");
+            }
+            user.setEmail(email);
+        }
+
+        // Update password
+        if (newPassword != null && !newPassword.isBlank()) {
+            if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+                throw new RuntimeException("Current password is incorrect");
+            }
+            user.setPassword(passwordEncoder.encode(newPassword));
+        }
+
+        return userRepository.save(user);
+    }
 }
