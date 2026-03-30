@@ -1,5 +1,6 @@
 package com.college.eventapp.controller;
 
+import com.college.eventapp.dto.IsRegisteredDTO;
 import com.college.eventapp.dto.RegistrationResponseDTO;
 import com.college.eventapp.model.Registration;
 import com.college.eventapp.service.NotificationService;
@@ -23,6 +24,7 @@ public class RegistrationController {
         this.notificationService = notificationService;
     }
 
+    // POST /api/events/{eventId}/register?userId={userId}
     @PostMapping("/events/{eventId}/register")
     public RegistrationResponseDTO registerForEvent(@PathVariable Long eventId,
                                                     @RequestParam Long userId) {
@@ -44,20 +46,24 @@ public class RegistrationController {
         return convertToDTO(reg);
     }
 
-    // ✅ NEW - Cancel registration
+    // DELETE /api/registrations/{registrationId}
     @DeleteMapping("/registrations/{registrationId}")
     public String cancelRegistration(@PathVariable Long registrationId) {
         registrationService.cancelRegistration(registrationId);
         return "Registration cancelled successfully";
     }
 
-    // ✅ NEW - Check if user already registered
+    // GET /api/events/{eventId}/is-registered?userId={userId}
     @GetMapping("/events/{eventId}/is-registered")
-    public boolean isUserRegistered(@PathVariable Long eventId,
-                                    @RequestParam Long userId) {
-        return registrationService.isUserRegistered(userId, eventId);
+    public IsRegisteredDTO isUserRegistered(@PathVariable Long eventId,
+                                            @RequestParam Long userId) {
+        boolean registered = registrationService.isUserRegistered(userId, eventId);
+        IsRegisteredDTO dto = new IsRegisteredDTO();
+        dto.setRegistered(registered);
+        return dto;
     }
 
+    // GET /api/users/{userId}/registrations
     @GetMapping("/users/{userId}/registrations")
     public List<RegistrationResponseDTO> getUserRegistrations(@PathVariable Long userId) {
         return registrationService.getUserRegistrations(userId)
@@ -66,6 +72,7 @@ public class RegistrationController {
                 .collect(Collectors.toList());
     }
 
+    // GET /api/events/{eventId}/registrations
     @GetMapping("/events/{eventId}/registrations")
     public List<RegistrationResponseDTO> getEventRegistrations(@PathVariable Long eventId) {
         return registrationService.getEventRegistrations(eventId)
@@ -73,6 +80,8 @@ public class RegistrationController {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
+    // ── Helper ────────────────────────────────────────────────────────────────
 
     private RegistrationResponseDTO convertToDTO(Registration reg) {
         RegistrationResponseDTO dto = new RegistrationResponseDTO();
@@ -92,6 +101,7 @@ public class RegistrationController {
             dto.setRegisteredAt(reg.getRegistrationDate()
                     .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
         }
+
         return dto;
     }
 }
