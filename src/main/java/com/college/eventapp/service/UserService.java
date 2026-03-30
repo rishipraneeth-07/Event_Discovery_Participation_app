@@ -13,4 +13,6 @@ public interface UserService {
     User getUserByEmail(String email);
     List<User> getUsersByRole(Role role);
     List<User> getAllUsers();
+    User updateUser(Long id, String name, String email,
+                    String currentPassword, String newPassword);
 }
