@@ -1,11 +1,14 @@
 package com.college.eventapp.service;
 
+import com.college.eventapp.exception.ResourceNotFoundException;
 import com.college.eventapp.model.Event;
 import com.college.eventapp.model.EventStatus;
 import com.college.eventapp.model.User;
 import com.college.eventapp.repository.EventRepository;
 import com.college.eventapp.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -25,7 +28,7 @@ public class EventServiceImpl implements EventService {
     public Event createEvent(Event event) {
         Long organizerId = event.getOrganizer().getId();
         User organizer = userRepository.findById(organizerId)
-                .orElseThrow(() -> new RuntimeException("Organizer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Organizer not found"));
         event.setOrganizer(organizer);
         event.setStatus(EventStatus.PENDING);
         return eventRepository.save(event);
@@ -34,7 +37,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public Event updateEvent(Long id, Event updatedEvent) {
         Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
 
         event.setTitle(updatedEvent.getTitle());
         event.setDescription(updatedEvent.getDescription());
@@ -54,14 +57,14 @@ public class EventServiceImpl implements EventService {
     @Override
     public void deleteEvent(Long id) {
         Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
         eventRepository.delete(event);
     }
 
     @Override
     public Event getEventById(Long id) {
         return eventRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
     }
 
     @Override
@@ -77,14 +80,14 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<Event> getEventsByOrganizer(Long organizerId) {
         User organizer = userRepository.findById(organizerId)
-                .orElseThrow(() -> new RuntimeException("Organizer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Organizer not found"));
         return eventRepository.findByOrganizer(organizer);
     }
 
     @Override
     public Event approveEvent(Long eventId) {
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
         event.setStatus(EventStatus.APPROVED);
         return eventRepository.save(event);
     }
@@ -92,8 +95,28 @@ public class EventServiceImpl implements EventService {
     @Override
     public Event rejectEvent(Long eventId) {
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
         event.setStatus(EventStatus.REJECTED);
         return eventRepository.save(event);
+    }
+
+    // ✅ NEW - Paginated all events
+    @Override
+    public Page<Event> getAllEventsPaged(Pageable pageable) {
+        return eventRepository.findAll(pageable);
+    }
+
+    // ✅ NEW - Paginated approved events
+    @Override
+    public Page<Event> getApprovedEventsPaged(Pageable pageable) {
+        return eventRepository.findByStatus(EventStatus.APPROVED, pageable);
+    }
+
+    // ✅ NEW - Paginated search
+    @Override
+    public Page<Event> searchEventsPaged(String keyword, Pageable pageable) {
+        return eventRepository
+                .findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCaseOrLocationContainingIgnoreCase(
+                        keyword, keyword, keyword, pageable);
     }
 }

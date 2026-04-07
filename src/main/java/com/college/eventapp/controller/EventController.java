@@ -3,41 +3,43 @@ package com.college.eventapp.controller;
 import com.college.eventapp.dto.CreateEventRequestDTO;
 import com.college.eventapp.dto.EventResponseDTO;
 import com.college.eventapp.dto.PagedResponseDTO;
+import com.college.eventapp.exception.BadRequestException;
+import com.college.eventapp.mapper.EventMapper;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import com.college.eventapp.model.Event;
 import com.college.eventapp.model.User;
-import com.college.eventapp.repository.RegistrationRepository;
-import com.college.eventapp.repository.UserRepository;
 import com.college.eventapp.service.EventService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@Validated
 @RequestMapping("/api/events")
 public class EventController {
 
     private final EventService eventService;
-    private final UserRepository userRepository;
-    private final RegistrationRepository registrationRepository;
+    private final EventMapper eventMapper;
 
     public EventController(EventService eventService,
-                           UserRepository userRepository,
-                           RegistrationRepository registrationRepository) {
+                           EventMapper eventMapper) {
         this.eventService = eventService;
-        this.userRepository = userRepository;
-        this.registrationRepository = registrationRepository;
+        this.eventMapper = eventMapper;
     }
 
     // POST /api/events
     @PostMapping
-    public EventResponseDTO createEvent(@RequestBody CreateEventRequestDTO request) {
+    public EventResponseDTO createEvent(@Valid @RequestBody CreateEventRequestDTO request) {
         Event event = new Event();
         event.setTitle(request.getTitle());
         event.setDescription(request.getDescription());
@@ -55,8 +57,8 @@ public class EventController {
 
     // PUT /api/events/{id}
     @PutMapping("/{id}")
-    public EventResponseDTO updateEvent(@PathVariable Long id,
-                                        @RequestBody CreateEventRequestDTO request) {
+    public EventResponseDTO updateEvent(@PathVariable @Positive(message = "Event id must be positive") Long id,
+                                        @Valid @RequestBody CreateEventRequestDTO request) {
         Event event = new Event();
         event.setTitle(request.getTitle());
         event.setDescription(request.getDescription());
@@ -70,14 +72,14 @@ public class EventController {
 
     // DELETE /api/events/{id}
     @DeleteMapping("/{id}")
-    public String deleteEvent(@PathVariable Long id) {
+    public String deleteEvent(@PathVariable @Positive(message = "Event id must be positive") Long id) {
         eventService.deleteEvent(id);
         return "Event deleted successfully";
     }
 
     // GET /api/events/{id}
     @GetMapping("/{id}")
-    public EventResponseDTO getEventById(@PathVariable Long id) {
+    public EventResponseDTO getEventById(@PathVariable @Positive(message = "Event id must be positive") Long id) {
         return convertToDTO(eventService.getEventById(id));
     }
 
@@ -86,8 +88,8 @@ public class EventController {
     // With params     → GET /api/events?page=0&size=10&sortBy=eventDateTime&sortDir=asc
     @GetMapping
     public Object getAllEvents(
-            @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer size,
+            @RequestParam(required = false) @Min(value = 0, message = "Page must be 0 or greater") Integer page,
+            @RequestParam(required = false) @Positive(message = "Size must be positive") Integer size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir
     ) {
@@ -112,9 +114,9 @@ public class EventController {
     // GET /api/events/search?keyword=music&page=0&size=10
     @GetMapping("/search")
     public Object searchEvents(
-            @RequestParam String keyword,
-            @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer size,
+            @RequestParam @NotBlank(message = "Keyword is required") String keyword,
+            @RequestParam(required = false) @Min(value = 0, message = "Page must be 0 or greater") Integer page,
+            @RequestParam(required = false) @Positive(message = "Size must be positive") Integer size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir
     ) {
@@ -139,7 +141,7 @@ public class EventController {
 
     // GET /api/events/organizer/{organizerId}
     @GetMapping("/organizer/{organizerId}")
-    public List<EventResponseDTO> getEventsByOrganizer(@PathVariable Long organizerId) {
+    public List<EventResponseDTO> getEventsByOrganizer(@PathVariable @Positive(message = "Organizer id must be positive") Long organizerId) {
         return eventService.getEventsByOrganizer(organizerId)
                 .stream()
                 .map(this::convertToDTO)
@@ -166,28 +168,7 @@ public class EventController {
     }
 
     private EventResponseDTO convertToDTO(Event event) {
-        EventResponseDTO dto = new EventResponseDTO();
-        dto.setId(event.getId());
-        dto.setTitle(event.getTitle());
-        dto.setDescription(event.getDescription());
-        dto.setLocation(event.getLocation());
-        dto.setCategory(event.getCategory() != null ? event.getCategory() : "General");
-        dto.setCapacity(event.getCapacity() != null ? event.getCapacity() : 0);
-        dto.setStatus(event.getStatus());
-        dto.setOrganizerId(event.getOrganizer().getId());
-        dto.setOrganizerName(event.getOrganizer().getName());
-
-        if (event.getEventDateTime() != null) {
-            dto.setDate(event.getEventDateTime().toLocalDate().toString());
-            dto.setTime(event.getEventDateTime().toLocalTime()
-                    .format(DateTimeFormatter.ofPattern("HH:mm")));
-        } else {
-            dto.setDate("");
-            dto.setTime("");
-        }
-
-        dto.setRegisteredCount(registrationRepository.findByEvent(event).size());
-        return dto;
+        return eventMapper.toDTO(event);
     }
 
     private LocalDateTime parseDateTime(String date, String time) {
@@ -195,7 +176,7 @@ public class EventController {
             String t = (time != null && !time.isBlank()) ? time : "00:00";
             return LocalDateTime.parse(date + "T" + t + ":00");
         } catch (Exception e) {
-            return LocalDateTime.now();
+            throw new BadRequestException("Date or time format is invalid");
         }
     }
 }

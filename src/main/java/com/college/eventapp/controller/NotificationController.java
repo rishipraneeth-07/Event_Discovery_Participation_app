@@ -1,8 +1,10 @@
 package com.college.eventapp.controller;
 
 import com.college.eventapp.dto.NotificationResponseDTO;
+import jakarta.validation.constraints.Positive;
 import com.college.eventapp.model.Notification;
 import com.college.eventapp.service.NotificationService;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.format.DateTimeFormatter;
@@ -10,6 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@Validated
 @RequestMapping("/api")
 public class NotificationController {
 
@@ -20,7 +23,7 @@ public class NotificationController {
     }
 
     @GetMapping("/users/{userId}/notifications")
-    public List<NotificationResponseDTO> getUserNotifications(@PathVariable Long userId) {
+    public List<NotificationResponseDTO> getUserNotifications(@PathVariable @Positive(message = "User id must be positive") Long userId) {
         return notificationService.getUserNotifications(userId)
                 .stream()
                 .map(this::convertToDTO)
@@ -28,7 +31,7 @@ public class NotificationController {
     }
 
     @PutMapping("/notifications/{id}/read")
-    public NotificationResponseDTO markAsRead(@PathVariable Long id) {
+    public NotificationResponseDTO markAsRead(@PathVariable @Positive(message = "Notification id must be positive") Long id) {
         notificationService.markAsRead(id);
         NotificationResponseDTO dto = new NotificationResponseDTO();
         dto.setId(id);

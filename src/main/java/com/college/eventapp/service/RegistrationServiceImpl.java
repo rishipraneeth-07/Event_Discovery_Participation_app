@@ -1,5 +1,7 @@
 package com.college.eventapp.service;
 
+import com.college.eventapp.exception.BadRequestException;
+import com.college.eventapp.exception.ResourceNotFoundException;
 import com.college.eventapp.model.Event;
 import com.college.eventapp.model.Registration;
 import com.college.eventapp.model.User;
@@ -29,21 +31,21 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     public Registration registerForEvent(Long userId, Long eventId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
 
         // ✅ Check if already registered
         if (registrationRepository.existsByUserAndEvent(user, event)) {
-            throw new RuntimeException("User already registered for this event");
+            throw new BadRequestException("Already registered for this event");
         }
 
         // ✅ Check capacity
         int currentCount = registrationRepository.findByEvent(event).size();
         if (event.getCapacity() != null && event.getCapacity() > 0
                 && currentCount >= event.getCapacity()) {
-            throw new RuntimeException("Event is full. No seats available");
+            throw new BadRequestException("Event is full");
         }
 
         Registration registration = new Registration();
@@ -57,14 +59,14 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     public List<Registration> getUserRegistrations(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return registrationRepository.findByUser(user);
     }
 
     @Override
     public List<Registration> getEventRegistrations(Long eventId) {
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
         return registrationRepository.findByEvent(event);
     }
 
@@ -72,7 +74,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     public void cancelRegistration(Long registrationId) {
         Registration registration = registrationRepository.findById(registrationId)
-                .orElseThrow(() -> new RuntimeException("Registration not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Registration not found"));
         registrationRepository.delete(registration);
     }
 
@@ -80,9 +82,9 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     public boolean isUserRegistered(Long userId, Long eventId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
         return registrationRepository.existsByUserAndEvent(user, event);
     }
 }

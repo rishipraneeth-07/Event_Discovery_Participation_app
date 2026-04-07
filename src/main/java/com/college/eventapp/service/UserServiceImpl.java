@@ -1,5 +1,7 @@
 package com.college.eventapp.service;
 
+import com.college.eventapp.exception.BadRequestException;
+import com.college.eventapp.exception.ResourceNotFoundException;
 import com.college.eventapp.model.Role;
 import com.college.eventapp.model.User;
 import com.college.eventapp.repository.UserRepository;
@@ -21,7 +23,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User registerUser(User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("Email already registered");
+            throw new BadRequestException("Email already registered");
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
@@ -30,10 +32,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public User loginUser(String email, String password) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         // ✅ Compare with encrypted password
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid password");
+            throw new BadRequestException("Invalid email or password");
         }
         return user;
     }
@@ -41,13 +43,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     @Override
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     @Override
@@ -65,7 +67,7 @@ public class UserServiceImpl implements UserService {
                            String currentPassword, String newPassword) {
 
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         // Update name
         if (name != null && !name.isBlank()) {
@@ -75,15 +77,18 @@ public class UserServiceImpl implements UserService {
         // Update email
         if (email != null && !email.isBlank() && !email.equals(user.getEmail())) {
             if (userRepository.existsByEmail(email)) {
-                throw new RuntimeException("Email already in use");
+                throw new BadRequestException("Email already in use");
             }
             user.setEmail(email);
         }
 
         // Update password
         if (newPassword != null && !newPassword.isBlank()) {
+            if (currentPassword == null || currentPassword.isBlank()) {
+                throw new BadRequestException("Current password is required");
+            }
             if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-                throw new RuntimeException("Current password is incorrect");
+                throw new BadRequestException("Current password is incorrect");
             }
             user.setPassword(passwordEncoder.encode(newPassword));
         }

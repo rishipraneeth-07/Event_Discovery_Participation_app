@@ -1,5 +1,6 @@
 package com.college.eventapp.service;
 
+import com.college.eventapp.exception.ResourceNotFoundException;
 import com.college.eventapp.model.Notification;
 import com.college.eventapp.model.User;
 import com.college.eventapp.repository.NotificationRepository;
@@ -24,7 +25,7 @@ public class NotificationServiceImpl implements NotificationService {
     public Notification createNotification(Long userId, String message) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Notification notification = new Notification();
         notification.setUser(user);
@@ -39,7 +40,7 @@ public class NotificationServiceImpl implements NotificationService {
     public List<Notification> getUserNotifications(Long userId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         return notificationRepository.findByUser(user);
     }
@@ -48,7 +49,7 @@ public class NotificationServiceImpl implements NotificationService {
     public void markAsRead(Long notificationId) {
 
         Notification notification = notificationRepository.findById(notificationId)
-                .orElseThrow(() -> new RuntimeException("Notification not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Notification not found"));
 
         notification.setRead(true);
         notificationRepository.save(notification);
