@@ -1,20 +1,23 @@
 package com.college.eventapp.controller;
 
 import com.college.eventapp.dto.EventResponseDTO;
+import com.college.eventapp.mapper.EventMapper;
+import jakarta.validation.constraints.Positive;
 import com.college.eventapp.model.Event;
 import com.college.eventapp.repository.RegistrationRepository;
 import com.college.eventapp.service.EventService;
 import com.college.eventapp.service.NotificationService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.annotation.Validated;
 import com.college.eventapp.dto.AdminStatsDTO;
 import com.college.eventapp.model.EventStatus;
 import com.college.eventapp.model.Role;
 import com.college.eventapp.repository.EventRepository;
 import com.college.eventapp.repository.UserRepository;
 
-import java.time.format.DateTimeFormatter;
 
 @RestController
+@Validated
 @RequestMapping("/api/admin/events")
 public class AdminController {
 
@@ -23,17 +26,20 @@ public class AdminController {
     private final NotificationService notificationService;
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final EventMapper eventMapper;
 
     public AdminController(EventService eventService,
                            RegistrationRepository registrationRepository,
                            NotificationService notificationService,
                            EventRepository eventRepository,
-                           UserRepository userRepository) {
+                           UserRepository userRepository,
+                           EventMapper eventMapper) {
         this.eventService = eventService;
         this.registrationRepository = registrationRepository;
         this.notificationService = notificationService;
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
+        this.eventMapper = eventMapper;
     }
 
     @GetMapping("/stats")
@@ -51,7 +57,7 @@ public class AdminController {
     }
 
     @PutMapping("/{id}/approve")
-    public EventResponseDTO approveEvent(@PathVariable Long id) {
+    public EventResponseDTO approveEvent(@PathVariable @Positive(message = "Event id must be positive") Long id) {
         Event event = eventService.approveEvent(id);
 
         // ✅ Notify organizer
@@ -72,7 +78,7 @@ public class AdminController {
     }
 
     @PutMapping("/{id}/reject")
-    public EventResponseDTO rejectEvent(@PathVariable Long id) {
+    public EventResponseDTO rejectEvent(@PathVariable @Positive(message = "Event id must be positive") Long id) {
         Event event = eventService.rejectEvent(id);
 
         // ✅ Notify organizer
@@ -85,27 +91,6 @@ public class AdminController {
     }
 
     private EventResponseDTO convertToDTO(Event event) {
-        EventResponseDTO dto = new EventResponseDTO();
-        dto.setId(event.getId());
-        dto.setTitle(event.getTitle());
-        dto.setDescription(event.getDescription());
-        dto.setLocation(event.getLocation());
-        dto.setCategory(event.getCategory() != null ? event.getCategory() : "General");
-        dto.setCapacity(event.getCapacity() != null ? event.getCapacity() : 0);
-        dto.setStatus(event.getStatus());
-        dto.setOrganizerId(event.getOrganizer().getId());
-        dto.setOrganizerName(event.getOrganizer().getName());
-
-        if (event.getEventDateTime() != null) {
-            dto.setDate(event.getEventDateTime().toLocalDate().toString());
-            dto.setTime(event.getEventDateTime().toLocalTime()
-                    .format(DateTimeFormatter.ofPattern("HH:mm")));
-        } else {
-            dto.setDate("");
-            dto.setTime("");
-        }
-
-        dto.setRegisteredCount(registrationRepository.findByEvent(event).size());
-        return dto;
+        return eventMapper.toDTO(event);
     }
 }
