@@ -23,7 +23,7 @@ public class EventServiceImpl implements EventService {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
     }
-
+//Impl
     @Override
     public Event createEvent(Event event) {
         Long organizerId = event.getOrganizer().getId();
@@ -100,19 +100,19 @@ public class EventServiceImpl implements EventService {
         return eventRepository.save(event);
     }
 
-    // ✅ NEW - Paginated all events
+
     @Override
     public Page<Event> getAllEventsPaged(Pageable pageable) {
         return eventRepository.findAll(pageable);
     }
 
-    // ✅ NEW - Paginated approved events
+
     @Override
     public Page<Event> getApprovedEventsPaged(Pageable pageable) {
         return eventRepository.findByStatus(EventStatus.APPROVED, pageable);
     }
 
-    // ✅ NEW - Paginated search
+
     @Override
     public Page<Event> searchEventsPaged(String keyword, Pageable pageable) {
         return eventRepository
