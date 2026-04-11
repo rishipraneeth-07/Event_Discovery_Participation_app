@@ -28,7 +28,6 @@ public class RegistrationController {
         this.notificationService = notificationService;
     }
 
-    // POST /api/events/{eventId}/register?userId={userId}
     @PostMapping("/events/{eventId}/register")
     public RegistrationResponseDTO registerForEvent(@PathVariable @Positive(message = "Event id must be positive") Long eventId,
                                                     @RequestParam @Positive(message = "User id must be positive") Long userId) {
@@ -50,14 +49,12 @@ public class RegistrationController {
         return convertToDTO(reg);
     }
 
-    // DELETE /api/registrations/{registrationId}
     @DeleteMapping("/registrations/{registrationId}")
     public MessageResponseDTO cancelRegistration(@PathVariable @Positive(message = "Registration id must be positive") Long registrationId) {
         registrationService.cancelRegistration(registrationId);
         return new MessageResponseDTO("Registration cancelled successfully");
     }
 
-    // GET /api/events/{eventId}/is-registered?userId={userId}
     @GetMapping("/events/{eventId}/is-registered")
     public IsRegisteredDTO isUserRegistered(@PathVariable @Positive(message = "Event id must be positive") Long eventId,
                                             @RequestParam @Positive(message = "User id must be positive") Long userId) {
@@ -67,7 +64,6 @@ public class RegistrationController {
         return dto;
     }
 
-    // GET /api/users/{userId}/registrations
     @GetMapping("/users/{userId}/registrations")
     public List<RegistrationResponseDTO> getUserRegistrations(@PathVariable @Positive(message = "User id must be positive") Long userId) {
         return registrationService.getUserRegistrations(userId)
@@ -76,7 +72,6 @@ public class RegistrationController {
                 .collect(Collectors.toList());
     }
 
-    // GET /api/events/{eventId}/registrations
     @GetMapping("/events/{eventId}/registrations")
     public List<RegistrationResponseDTO> getEventRegistrations(@PathVariable @Positive(message = "Event id must be positive") Long eventId) {
         return registrationService.getEventRegistrations(eventId)
@@ -85,7 +80,7 @@ public class RegistrationController {
                 .collect(Collectors.toList());
     }
 
-    // ── Helper ────────────────────────────────────────────────────────────────
+
 
     private RegistrationResponseDTO convertToDTO(Registration reg) {
         RegistrationResponseDTO dto = new RegistrationResponseDTO();
