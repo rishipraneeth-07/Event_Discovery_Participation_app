@@ -36,12 +36,10 @@ public class RegistrationServiceImpl implements RegistrationService {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
 
-        // ✅ Check if already registered
         if (registrationRepository.existsByUserAndEvent(user, event)) {
             throw new BadRequestException("Already registered for this event");
         }
 
-        // ✅ Check capacity
         int currentCount = registrationRepository.findByEvent(event).size();
         if (event.getCapacity() != null && event.getCapacity() > 0
                 && currentCount >= event.getCapacity()) {
@@ -70,7 +68,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         return registrationRepository.findByEvent(event);
     }
 
-    // ✅ NEW - Cancel registration
     @Override
     public void cancelRegistration(Long registrationId) {
         Registration registration = registrationRepository.findById(registrationId)
@@ -78,7 +75,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         registrationRepository.delete(registration);
     }
 
-    // ✅ NEW - Check if user already registered
     @Override
     public boolean isUserRegistered(Long userId, Long eventId) {
         User user = userRepository.findById(userId)
