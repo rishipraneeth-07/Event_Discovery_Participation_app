@@ -33,13 +33,12 @@ public class RegistrationController {
                                                     @RequestParam @Positive(message = "User id must be positive") Long userId) {
         Registration reg = registrationService.registerForEvent(userId, eventId);
 
-        // ✅ Notify student
         notificationService.createNotification(
                 userId,
                 "You have successfully registered for '" + reg.getEvent().getTitle() + "'. See you there!"
         );
 
-        // ✅ Notify organizer
+
         notificationService.createNotification(
                 reg.getEvent().getOrganizer().getId(),
                 "A new student '" + reg.getUser().getName() + "' registered for your event '" +
