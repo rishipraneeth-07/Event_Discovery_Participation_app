@@ -1,7 +1,9 @@
 package com.college.eventapp.controller;
 
 import com.college.eventapp.dto.CreateEventRequestDTO;
+import com.college.eventapp.dto.EventAnalyticsResponseDTO;
 import com.college.eventapp.dto.EventResponseDTO;
+import com.college.eventapp.dto.MessageResponseDTO;
 import com.college.eventapp.dto.PagedResponseDTO;
 import com.college.eventapp.exception.BadRequestException;
 import com.college.eventapp.mapper.EventMapper;
@@ -72,9 +74,25 @@ public class EventController {
 
     // DELETE /api/events/{id}
     @DeleteMapping("/{id}")
-    public String deleteEvent(@PathVariable @Positive(message = "Event id must be positive") Long id) {
+    public MessageResponseDTO deleteEvent(@PathVariable @Positive(message = "Event id must be positive") Long id) {
         eventService.deleteEvent(id);
-        return "Event deleted successfully";
+        return new MessageResponseDTO("Event deleted successfully");
+    }
+
+    @PutMapping("/{id}/cancel")
+    public MessageResponseDTO cancelEvent(@PathVariable @Positive(message = "Event id must be positive") Long id) {
+        eventService.cancelEvent(id);
+        return new MessageResponseDTO("Event cancelled successfully");
+    }
+
+    @PostMapping("/{id}/duplicate")
+    public EventResponseDTO duplicateEvent(@PathVariable @Positive(message = "Event id must be positive") Long id) {
+        return convertToDTO(eventService.duplicateEvent(id));
+    }
+
+    @GetMapping("/{id}/analytics")
+    public EventAnalyticsResponseDTO getEventAnalytics(@PathVariable @Positive(message = "Event id must be positive") Long id) {
+        return eventService.getEventAnalytics(id);
     }
 
     // GET /api/events/{id}
@@ -83,22 +101,27 @@ public class EventController {
         return convertToDTO(eventService.getEventById(id));
     }
 
+    @GetMapping
+    public List<EventResponseDTO> getHomeFeedEvents() {
+        return eventService.getAllEvents()
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
     // GET /api/events
     // Without params  → returns all events (no pagination)
     // With params     → GET /api/events?page=0&size=10&sortBy=eventDateTime&sortDir=asc
-    @GetMapping
-    public Object getAllEvents(
-            @RequestParam(required = false) @Min(value = 0, message = "Page must be 0 or greater") Integer page,
-            @RequestParam(required = false) @Positive(message = "Size must be positive") Integer size,
+    @GetMapping("/paged")
+    public PagedResponseDTO<EventResponseDTO> getAllEvents(
+            @RequestParam @Min(value = 0, message = "Page must be 0 or greater") Integer page,
+            @RequestParam @Positive(message = "Size must be positive") Integer size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir
     ) {
         // If no page/size params → return plain list (keeps Android working as before)
         if (page == null || size == null) {
-            return eventService.getAllEvents()
-                    .stream()
-                    .map(this::convertToDTO)
-                    .collect(Collectors.toList());
+            throw new BadRequestException("Page and size are required for paged results");
         }
 
         // With page/size → return paginated response
