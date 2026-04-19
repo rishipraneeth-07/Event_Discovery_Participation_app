@@ -2,8 +2,12 @@ package com.college.eventapp.controller;
 
 import com.college.eventapp.dto.AuthRequestDTO;
 import com.college.eventapp.dto.AuthResponseDTO;
+import com.college.eventapp.dto.ForgotPasswordRequestDTO;
+import com.college.eventapp.dto.MessageResponseDTO;
+import com.college.eventapp.dto.ResetPasswordRequestDTO;
 import jakarta.validation.Valid;
 import com.college.eventapp.model.User;
+import com.college.eventapp.service.PasswordResetService;
 import com.college.eventapp.service.UserService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +18,12 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final UserService userService;
+    private final PasswordResetService passwordResetService;
 
-    public AuthController(UserService userService) {
+    public AuthController(UserService userService,
+                          PasswordResetService passwordResetService) {
         this.userService = userService;
+        this.passwordResetService = passwordResetService;
     }
 
     @PostMapping("/register")
@@ -35,6 +42,16 @@ public class AuthController {
     public AuthResponseDTO login(@Valid @RequestBody LoginRequest request) {
         User user = userService.loginUser(request.getEmail(), request.getPassword());
         return buildAuthResponse(user);
+    }
+
+    @PostMapping("/forgot-password")
+    public MessageResponseDTO forgotPassword(@Valid @RequestBody ForgotPasswordRequestDTO request) {
+        return new MessageResponseDTO(passwordResetService.requestPasswordReset(request.getEmail()));
+    }
+
+    @PostMapping("/reset-password")
+    public MessageResponseDTO resetPassword(@Valid @RequestBody ResetPasswordRequestDTO request) {
+        return new MessageResponseDTO(passwordResetService.resetPassword(request.getToken(), request.getNewPassword()));
     }
 
     public static class LoginRequest {
