@@ -31,9 +31,10 @@ public class SavedEventController {
     }
 
     @PostMapping("/{eventId}")
-    public EventResponseDTO saveEvent(@PathVariable @Positive(message = "User id must be positive") Long userId,
-                                      @PathVariable @Positive(message = "Event id must be positive") Long eventId) {
-        return eventMapper.toDTO(savedEventService.saveEvent(userId, eventId));
+    public MessageResponseDTO saveEvent(@PathVariable @Positive(message = "User id must be positive") Long userId,
+                                        @PathVariable @Positive(message = "Event id must be positive") Long eventId) {
+        savedEventService.saveEvent(userId, eventId);
+        return new MessageResponseDTO("Event saved successfully");
     }
 
     @DeleteMapping("/{eventId}")
