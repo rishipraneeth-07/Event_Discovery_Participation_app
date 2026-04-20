@@ -5,7 +5,6 @@ import com.college.eventapp.dto.MessageResponseDTO;
 import com.college.eventapp.dto.RegistrationResponseDTO;
 import jakarta.validation.constraints.Positive;
 import com.college.eventapp.model.Registration;
-import com.college.eventapp.service.NotificationService;
 import com.college.eventapp.service.RegistrationService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -20,31 +19,15 @@ import java.util.stream.Collectors;
 public class RegistrationController {
 
     private final RegistrationService registrationService;
-    private final NotificationService notificationService;
 
-    public RegistrationController(RegistrationService registrationService,
-                                  NotificationService notificationService) {
+    public RegistrationController(RegistrationService registrationService) {
         this.registrationService = registrationService;
-        this.notificationService = notificationService;
     }
 
     @PostMapping("/events/{eventId}/register")
     public RegistrationResponseDTO registerForEvent(@PathVariable @Positive(message = "Event id must be positive") Long eventId,
                                                     @RequestParam @Positive(message = "User id must be positive") Long userId) {
         Registration reg = registrationService.registerForEvent(userId, eventId);
-
-        notificationService.createNotification(
-                userId,
-                "You have successfully registered for '" + reg.getEvent().getTitle() + "'. See you there!"
-        );
-
-
-        notificationService.createNotification(
-                reg.getEvent().getOrganizer().getId(),
-                "A new student '" + reg.getUser().getName() + "' registered for your event '" +
-                        reg.getEvent().getTitle() + "'"
-        );
-
         return convertToDTO(reg);
     }
 
@@ -57,9 +40,12 @@ public class RegistrationController {
     @GetMapping("/events/{eventId}/is-registered")
     public IsRegisteredDTO isUserRegistered(@PathVariable @Positive(message = "Event id must be positive") Long eventId,
                                             @RequestParam @Positive(message = "User id must be positive") Long userId) {
-        boolean registered = registrationService.isUserRegistered(userId, eventId);
+        Registration registration = registrationService.getUserRegistration(userId, eventId);
         IsRegisteredDTO dto = new IsRegisteredDTO();
-        dto.setRegistered(registered);
+        dto.setRegistered(registration != null);
+        if (registration != null) {
+            dto.setRegistrationId(registration.getId());
+        }
         return dto;
     }
 
