@@ -13,11 +13,17 @@ import com.college.eventapp.repository.UserRepository;
 import com.college.eventapp.service.EventService;
 import jakarta.validation.constraints.Positive;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Validated
-@RequestMapping("/api/admin/events")
+@RequestMapping("/api/admin")
 public class AdminController {
 
     private final EventService eventService;
@@ -52,50 +58,17 @@ public class AdminController {
         return stats;
     }
 
-    @PutMapping("/{id}/approve")
-    public EventResponseDTO approveEvent(@PathVariable @Positive(message = "Event id must be positive") Long id,
-                                         @RequestBody(required = false) ModerationDecisionRequestDTO request) {
+    @PutMapping("/events/{id}/approve")
+    public EventResponseDTO approveEventLegacy(@PathVariable @Positive(message = "Event id must be positive") Long id,
+                                               @RequestBody(required = false) ModerationDecisionRequestDTO request) {
         Event event = eventService.approveEvent(id, request != null ? request.getNote() : null);
-        /*
-
-        // ✅ Notify organizer
-        notificationService.createNotification(
-                event.getOrganizer().getId(),
-                "Your event '" + event.getTitle() + "' has been approved! Students can now register.",
-                "eventApproval"
-        );
-
-        // ✅ Notify all registered students
-        registrationRepository.findByEvent(event).forEach(reg ->
-                notificationService.createNotification(
-                        reg.getUser().getId(),
-                        "Good news! The event '" + event.getTitle() + "' you registered for has been approved.",
-                        "registrationUpdates"
-                )
-        );
-
-        */
-        return convertToDTO(event);
+        return eventMapper.toDTO(event);
     }
 
-    @PutMapping("/{id}/reject")
-    public EventResponseDTO rejectEvent(@PathVariable @Positive(message = "Event id must be positive") Long id,
-                                        @RequestBody(required = false) ModerationDecisionRequestDTO request) {
+    @PutMapping("/events/{id}/reject")
+    public EventResponseDTO rejectEventLegacy(@PathVariable @Positive(message = "Event id must be positive") Long id,
+                                              @RequestBody(required = false) ModerationDecisionRequestDTO request) {
         Event event = eventService.rejectEvent(id, request != null ? request.getNote() : null);
-        /*
-
-        // ✅ Notify organizer
-        notificationService.createNotification(
-                event.getOrganizer().getId(),
-                "Your event '" + event.getTitle() + "' has been rejected. Please review and resubmit.",
-                "eventApproval"
-        );
-
-        */
-        return convertToDTO(event);
-    }
-
-    private EventResponseDTO convertToDTO(Event event) {
         return eventMapper.toDTO(event);
     }
 }
