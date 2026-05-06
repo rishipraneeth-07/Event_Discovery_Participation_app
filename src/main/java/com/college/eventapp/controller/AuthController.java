@@ -7,6 +7,7 @@ import com.college.eventapp.dto.MessageResponseDTO;
 import com.college.eventapp.dto.ResetPasswordRequestDTO;
 import jakarta.validation.Valid;
 import com.college.eventapp.model.User;
+import com.college.eventapp.security.JwtTokenService;
 import com.college.eventapp.service.PasswordResetService;
 import com.college.eventapp.service.UserService;
 import org.springframework.validation.annotation.Validated;
@@ -19,11 +20,14 @@ public class AuthController {
 
     private final UserService userService;
     private final PasswordResetService passwordResetService;
+    private final JwtTokenService jwtTokenService;
 
     public AuthController(UserService userService,
-                          PasswordResetService passwordResetService) {
+                          PasswordResetService passwordResetService,
+                          JwtTokenService jwtTokenService) {
         this.userService = userService;
         this.passwordResetService = passwordResetService;
+        this.jwtTokenService = jwtTokenService;
     }
 
     @PostMapping("/register")
@@ -81,7 +85,7 @@ public class AuthController {
 
     private AuthResponseDTO buildAuthResponse(User user) {
         AuthResponseDTO response = new AuthResponseDTO();
-        response.setToken("user-" + user.getId());
+        response.setToken(jwtTokenService.generateToken(user));
         response.setUserId(user.getId());
         response.setName(user.getName());
         response.setEmail(user.getEmail());
