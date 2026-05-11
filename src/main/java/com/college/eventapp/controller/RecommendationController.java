@@ -3,6 +3,7 @@ package com.college.eventapp.controller;
 import com.college.eventapp.dto.EventResponseDTO;
 import com.college.eventapp.mapper.EventMapper;
 import jakarta.validation.constraints.Positive;
+import com.college.eventapp.security.CurrentUserService;
 import com.college.eventapp.service.RecommendationService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,23 +16,34 @@ import java.util.List;
 
 @RestController
 @Validated
-@RequestMapping("/api/users/{userId}")
+@RequestMapping("/api")
 public class RecommendationController {
 
     private static final int DEFAULT_LIMIT = 10;
 
     private final RecommendationService recommendationService;
     private final EventMapper eventMapper;
+    private final CurrentUserService currentUserService;
 
     public RecommendationController(RecommendationService recommendationService,
-                                    EventMapper eventMapper) {
+                                    EventMapper eventMapper,
+                                    CurrentUserService currentUserService) {
         this.recommendationService = recommendationService;
         this.eventMapper = eventMapper;
+        this.currentUserService = currentUserService;
     }
 
-    @GetMapping("/recommended-events")
-    public List<EventResponseDTO> getRecommendedEvents(@PathVariable @Positive(message = "User id must be positive") Long userId,
-                                                       @RequestParam(defaultValue = "10") @Positive(message = "Limit must be positive") int limit) {
+    @GetMapping("/recommendations")
+    public List<EventResponseDTO> getRecommendedEvents() {
+        return recommendationService.getRecommendedEvents(currentUserService.getCurrentUser().id(), 20)
+                .stream()
+                .map(eventMapper::toDTO)
+                .toList();
+    }
+
+    @GetMapping("/users/{userId}/recommended-events")
+    public List<EventResponseDTO> getRecommendedEventsLegacy(@PathVariable @Positive(message = "User id must be positive") Long userId,
+                                                             @RequestParam(defaultValue = "10") @Positive(message = "Limit must be positive") int limit) {
         int safeLimit = limit > 0 ? limit : DEFAULT_LIMIT;
         return recommendationService.getRecommendedEvents(userId, safeLimit)
                 .stream()
