@@ -1,10 +1,13 @@
 package com.college.eventapp.service;
 
 import com.college.eventapp.exception.BadRequestException;
+import com.college.eventapp.exception.ConflictException;
 import com.college.eventapp.exception.ResourceNotFoundException;
+import com.college.eventapp.exception.UnauthorizedException;
 import com.college.eventapp.model.Role;
 import com.college.eventapp.model.User;
 import com.college.eventapp.repository.UserRepository;
+import com.college.eventapp.security.CurrentUserService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,16 +17,24 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final CurrentUserService currentUserService;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository,
+                           CurrentUserService currentUserService,
+                           BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.currentUserService = currentUserService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public User registerUser(User user) {
+        if (user.getRole() == Role.ADMIN) {
+            throw new BadRequestException("Admin accounts cannot be self-registered");
+        }
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new BadRequestException("Email already registered");
+            throw new ConflictException("Email already registered");
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
@@ -33,15 +44,15 @@ public class UserServiceImpl implements UserService {
     public User loginUser(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        // ✅ Compare with encrypted password
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new BadRequestException("Invalid email or password");
+            throw new UnauthorizedException("Invalid credentials");
         }
         return user;
     }
 
     @Override
     public User getUserById(Long id) {
+        currentUserService.requireSameUserOrAdmin(id);
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
@@ -65,16 +76,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUser(Long id, String name, String email,
                            String currentPassword, String newPassword) {
+        currentUserService.requireSameUserOrAdmin(id);
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        // Update name
         if (name != null && !name.isBlank()) {
             user.setName(name);
         }
 
-        // Update email
         if (email != null && !email.isBlank() && !email.equals(user.getEmail())) {
             if (userRepository.existsByEmail(email)) {
                 throw new BadRequestException("Email already in use");
@@ -82,7 +92,6 @@ public class UserServiceImpl implements UserService {
             user.setEmail(email);
         }
 
-        // Update password
         if (newPassword != null && !newPassword.isBlank()) {
             if (currentPassword == null || currentPassword.isBlank()) {
                 throw new BadRequestException("Current password is required");
