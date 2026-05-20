@@ -7,6 +7,7 @@ import com.college.eventapp.model.User;
 import com.college.eventapp.model.UserInterest;
 import com.college.eventapp.repository.UserInterestRepository;
 import com.college.eventapp.repository.UserRepository;
+import com.college.eventapp.security.CurrentUserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,11 +21,14 @@ public class UserInterestServiceImpl implements UserInterestService {
 
     private final UserRepository userRepository;
     private final UserInterestRepository userInterestRepository;
+    private final CurrentUserService currentUserService;
 
     public UserInterestServiceImpl(UserRepository userRepository,
-                                   UserInterestRepository userInterestRepository) {
+                                   UserInterestRepository userInterestRepository,
+                                   CurrentUserService currentUserService) {
         this.userRepository = userRepository;
         this.userInterestRepository = userInterestRepository;
+        this.currentUserService = currentUserService;
     }
 
     @Override
@@ -100,6 +104,7 @@ public class UserInterestServiceImpl implements UserInterestService {
     }
 
     private User getStudentUser(Long userId) {
+        currentUserService.requireSameUser(userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         if (user.getRole() != Role.STUDENT) {
