@@ -32,7 +32,7 @@ public class CreateEventRequestDTO {
     private String category;
 
     @NotNull(message = "Capacity is required")
-    @Min(value = 1, message = "Capacity must be at least 1")
+    @Min(value = 0, message = "Capacity must be 0 (unlimited) or greater")
     @Max(value = 100000, message = "Capacity is too large")
     private Integer capacity;
 
