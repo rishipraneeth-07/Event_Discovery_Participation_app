@@ -33,4 +33,8 @@
 - **App content** — Serve dynamic app-level content via API
 
 
+## Application Flow
+
+<img width="1365" height="1160" alt="Screenshot 2026-02-08 125845" src="https://github.com/user-attachments/assets/3a2fc75b-cb45-4c70-8d1b-099016e03c65" />
+
 
