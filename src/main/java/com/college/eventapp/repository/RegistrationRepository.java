@@ -11,7 +11,10 @@ import java.util.List;
 @Repository
 public interface RegistrationRepository  extends JpaRepository<Registration,Long> {
     List<Registration> findByUser(User user);
+    List<Registration> findByUserOrderByEventEventDateTimeDesc(User user);
     List<Registration> findByEvent(Event event);
+    void deleteByEvent(Event event);
     boolean existsByUserAndEvent(User user,Event event);
+    java.util.Optional<Registration> findByUserAndEvent(User user, Event event);
     long countByEvent(Event event);
 }
