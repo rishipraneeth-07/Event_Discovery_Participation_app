@@ -13,4 +13,6 @@ import java.util.Optional;
 public interface RecentlyViewedEventRepository extends JpaRepository<RecentlyViewedEvent, Long> {
     Optional<RecentlyViewedEvent> findByUserAndEvent(User user, Event event);
     List<RecentlyViewedEvent> findByUserOrderByViewedAtDesc(User user);
+    long countByEvent(Event event);
+    void deleteByEvent(Event event);
 }
