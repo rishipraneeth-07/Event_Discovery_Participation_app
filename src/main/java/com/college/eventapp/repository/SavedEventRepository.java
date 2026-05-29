@@ -14,4 +14,6 @@ public interface SavedEventRepository extends JpaRepository<SavedEvent, Long> {
     boolean existsByUserAndEvent(User user, Event event);
     Optional<SavedEvent> findByUserAndEvent(User user, Event event);
     List<SavedEvent> findByUserOrderByCreatedAtDesc(User user);
+    long countByEvent(Event event);
+    void deleteByEvent(Event event);
 }
