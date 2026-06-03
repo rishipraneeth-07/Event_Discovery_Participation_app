@@ -9,6 +9,7 @@ import com.college.eventapp.model.User;
 import com.college.eventapp.repository.EventRepository;
 import com.college.eventapp.repository.RecentlyViewedEventRepository;
 import com.college.eventapp.repository.UserRepository;
+import com.college.eventapp.security.CurrentUserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,13 +22,16 @@ public class RecentlyViewedEventServiceImpl implements RecentlyViewedEventServic
     private final RecentlyViewedEventRepository recentlyViewedEventRepository;
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
+    private final CurrentUserService currentUserService;
 
     public RecentlyViewedEventServiceImpl(RecentlyViewedEventRepository recentlyViewedEventRepository,
                                           UserRepository userRepository,
-                                          EventRepository eventRepository) {
+                                          EventRepository eventRepository,
+                                          CurrentUserService currentUserService) {
         this.recentlyViewedEventRepository = recentlyViewedEventRepository;
         this.userRepository = userRepository;
         this.eventRepository = eventRepository;
+        this.currentUserService = currentUserService;
     }
 
     @Override
@@ -56,6 +60,7 @@ public class RecentlyViewedEventServiceImpl implements RecentlyViewedEventServic
     }
 
     private User getStudentUser(Long userId) {
+        currentUserService.requireSameUser(userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         if (user.getRole() != Role.STUDENT) {
