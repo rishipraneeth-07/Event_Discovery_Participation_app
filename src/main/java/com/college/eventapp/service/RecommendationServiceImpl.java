@@ -15,6 +15,7 @@ import com.college.eventapp.repository.RegistrationRepository;
 import com.college.eventapp.repository.SavedEventRepository;
 import com.college.eventapp.repository.UserInterestRepository;
 import com.college.eventapp.repository.UserRepository;
+import com.college.eventapp.security.CurrentUserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,19 +39,22 @@ public class RecommendationServiceImpl implements RecommendationService {
     private final SavedEventRepository savedEventRepository;
     private final RecentlyViewedEventRepository recentlyViewedEventRepository;
     private final RegistrationRepository registrationRepository;
+    private final CurrentUserService currentUserService;
 
     public RecommendationServiceImpl(UserRepository userRepository,
                                      EventRepository eventRepository,
                                      UserInterestRepository userInterestRepository,
                                      SavedEventRepository savedEventRepository,
                                      RecentlyViewedEventRepository recentlyViewedEventRepository,
-                                     RegistrationRepository registrationRepository) {
+                                     RegistrationRepository registrationRepository,
+                                     CurrentUserService currentUserService) {
         this.userRepository = userRepository;
         this.eventRepository = eventRepository;
         this.userInterestRepository = userInterestRepository;
         this.savedEventRepository = savedEventRepository;
         this.recentlyViewedEventRepository = recentlyViewedEventRepository;
         this.registrationRepository = registrationRepository;
+        this.currentUserService = currentUserService;
     }
 
     @Override
@@ -166,6 +170,7 @@ public class RecommendationServiceImpl implements RecommendationService {
     }
 
     private User getStudentUser(Long userId) {
+        currentUserService.requireSameUser(userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         if (user.getRole() != Role.STUDENT) {
