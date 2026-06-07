@@ -47,6 +47,11 @@
 
 <img width="682" height="1469" alt="Screenshot 2026-04-23 012512" src="https://github.com/user-attachments/assets/917cf557-e03b-4eaf-baac-e16db425552c" />
 
+### Student Dashboard
+
+<img width="691" height="1466" alt="Screenshot 2026-04-23 013054" src="https://github.com/user-attachments/assets/98c27535-bf14-4d08-af4e-6ff4f288abe8" />
+
+
 
 
 
