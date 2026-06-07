@@ -43,6 +43,11 @@
 
 <img width="690" height="1472" alt="Screenshot 2026-04-23 012420" src="https://github.com/user-attachments/assets/a4c1db4c-697c-4312-966a-bb34cd4b914b" />
 
+### Register Screen
+
+<img width="682" height="1469" alt="Screenshot 2026-04-23 012512" src="https://github.com/user-attachments/assets/917cf557-e03b-4eaf-baac-e16db425552c" />
+
+
 
 
 
