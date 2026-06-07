@@ -51,6 +51,13 @@
 
 <img width="691" height="1466" alt="Screenshot 2026-04-23 013054" src="https://github.com/user-attachments/assets/98c27535-bf14-4d08-af4e-6ff4f288abe8" />
 
+### Events Screen
+
+<img width="683" height="1456" alt="Screenshot 2026-04-23 013144" src="https://github.com/user-attachments/assets/20627657-3470-487b-bea1-c73fa996f5fa" />
+
+
+
+
 
 
 
