@@ -61,6 +61,12 @@
 <img width="699" height="1444" alt="Screenshot 2026-04-23 013236" src="https://github.com/user-attachments/assets/7d1d3d4a-f16f-4d28-b37c-73a55bb4904f" />
 
 
+### Notification Screen
+
+<img width="694" height="1439" alt="Screenshot 2026-04-23 013304" src="https://github.com/user-attachments/assets/7ea589ca-c9e4-447b-8c15-b8fe2ce63802" />
+
+
+
 
 
 
