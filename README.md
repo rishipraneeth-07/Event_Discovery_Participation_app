@@ -56,7 +56,9 @@
 <img width="683" height="1456" alt="Screenshot 2026-04-23 013144" src="https://github.com/user-attachments/assets/20627657-3470-487b-bea1-c73fa996f5fa" />
 
 
+### Registrations Screen
 
+<img width="699" height="1444" alt="Screenshot 2026-04-23 013236" src="https://github.com/user-attachments/assets/7d1d3d4a-f16f-4d28-b37c-73a55bb4904f" />
 
 
 
