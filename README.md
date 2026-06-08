@@ -66,6 +66,12 @@
 <img width="694" height="1439" alt="Screenshot 2026-04-23 013304" src="https://github.com/user-attachments/assets/7ea589ca-c9e4-447b-8c15-b8fe2ce63802" />
 
 
+### Organizer Dashboard
+
+<img width="687" height="1459" alt="Screenshot 2026-04-23 013417" src="https://github.com/user-attachments/assets/ff267c04-a9dc-4859-b446-bedae27cd128" />
+
+
+
 
 
 
