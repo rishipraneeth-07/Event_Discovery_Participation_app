@@ -74,6 +74,7 @@
 ### Organizer events
 
 
+<img width="685" height="1457" alt="Screenshot 2026-04-23 013505" src="https://github.com/user-attachments/assets/2da729ce-ed72-485a-a05b-b17b82285da9" />
 
 
 
