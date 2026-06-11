@@ -84,6 +84,7 @@
 ### Admin homepage 
 
 
+<img width="669" height="1419" alt="Screenshot 2026-04-23 013725" src="https://github.com/user-attachments/assets/a4891e35-3f65-49e2-bd76-6fa1fda054ec" />
 
 
 
