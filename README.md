@@ -71,12 +71,26 @@
 <img width="687" height="1459" alt="Screenshot 2026-04-23 013417" src="https://github.com/user-attachments/assets/ff267c04-a9dc-4859-b446-bedae27cd128" />
 
 
+### Organizer events
 
 
+<img width="685" height="1457" alt="Screenshot 2026-04-23 013505" src="https://github.com/user-attachments/assets/2da729ce-ed72-485a-a05b-b17b82285da9" />
 
 
+### Admin Panel screen
+
+<img width="680" height="1451" alt="Screenshot 2026-04-23 013554" src="https://github.com/user-attachments/assets/5fca5131-1642-4acd-a24c-14bbfbeeedcf" />
+
+### Admin homepage 
 
 
+<img width="669" height="1419" alt="Screenshot 2026-04-23 013725" src="https://github.com/user-attachments/assets/a4891e35-3f65-49e2-bd76-6fa1fda054ec" />
+
+### Admin homepage2
+
+<img width="675" height="1462" alt="Screenshot 2026-04-23 013816" src="https://github.com/user-attachments/assets/ff2bc2ac-05f3-4359-9a62-8fc364b6b7c5" />
 
 
+## Project Status
 
+This project has been successfully completed and includes all planned features and functionality.
