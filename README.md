@@ -1,4 +1,4 @@
-# EventApp Backend
+ # EventApp Backend
 
 - A RESTful backend for a college event management platform built with Spring Boot 4, MySQL, and JWT-based stateless authentication. It supports three user roles — Student, Organizer, and Admin — with a full event lifecycle including creation, moderation, registration, recommendations, and notifications.
 
@@ -89,6 +89,28 @@
 ### Admin homepage2
 
 <img width="675" height="1462" alt="Screenshot 2026-04-23 013816" src="https://github.com/user-attachments/assets/ff2bc2ac-05f3-4359-9a62-8fc364b6b7c5" />
+
+## API Endpoints
+
+The backend exposes RESTful APIs organized by feature.
+All protected endpoints require a valid JWT access token.
+
+| Module | Endpoint | Method | Access |
+|---|---|---|---|
+| Auth | `/api/auth/register` | POST | Public |
+| Auth | `/api/auth/login` | POST | Public |
+| Auth | `/api/auth/forgot-password` | POST | Public |
+| Auth | `/api/auth/reset-password` | POST | Public |
+| Events | `/api/events` | GET | Authenticated |
+| Events | `/api/events/{id}` | GET | Authenticated |
+| Events | `/api/events` | POST | Organizer |
+| Events | `/api/events/{id}` | PUT | Organizer |
+| Events | `/api/events/{id}` | DELETE | Organizer |
+| Moderation | `/api/admin/events/{id}/approve` | PATCH | Admin |
+| Registration | `/api/events/{id}/register` | POST | Student |
+| Registration | `/api/events/{id}/cancel` | DELETE | Student |
+| Notifications | `/api/notifications` | GET | Authenticated |
+| Saved Events | `/api/saved-events` | GET | Student |
 
 
 ## Project Status
