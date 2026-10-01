@@ -32,6 +32,39 @@
 - **Admin dashboard** — Stats, user management, event moderation controls
 - **App content** — Serve dynamic app-level content via API
 
+## Security Architecture
+
+EventApp uses Spring Security and JWT-based stateless
+authentication to secure its REST APIs.
+
+### Authentication Flow
+
+1. Users register with their account details.
+2. Users log in with their credentials.
+3. The server validates credentials and issues a JWT.
+4. Clients include the JWT in the Authorization header
+   for protected API requests.
+5. A JWT authentication filter validates incoming tokens
+   and establishes the user's security context.
+6. Role-based authorization determines whether the user
+   can access the requested resource.
+
+### Authorization
+
+- STUDENT: Browse events, register, save events,
+  manage preferences, and receive notifications.
+- ORGANIZER: Create and manage events and view attendees.
+- ADMIN: Manage users, moderate events, and access
+  administrative functionality.
+
+### Security Features
+
+- Stateless session management
+- Password hashing
+- JWT validation
+- Role-based endpoint authorization
+- Request validation
+- Protected resources
 
 ## Application Flow
 
